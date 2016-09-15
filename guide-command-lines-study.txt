@@ -17,3 +17,7 @@ Sample app - commandlines
 1 - git init
 2 - git add -A
 3 - git commit -m "Initialize Repository"
+4 - mv README.rdoc README.md
+5 - Chenge file to appears in the next command
+6 - git status
+7 - git commit -am "Improve the README"
