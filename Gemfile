@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+ruby "2.2.5"
 
 # Gems from Railstutorial - safaribooks
 # sample-app-gemfile.railstutorial.org
