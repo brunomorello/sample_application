@@ -21,3 +21,6 @@ Sample app - commandlines
 5 - Chenge file to appears in the next command
 6 - git status
 7 - git commit -am "Improve the README"
+8 - Create you project on GitHub
+9 - git remote add origin git@github.com:brunomorello/sample_application.git
+10 - git push -u origin master
