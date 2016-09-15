@@ -1,0 +1,19 @@
+Sample app - commandlines
+
+# create app
+
+1 rails new sample_app
+2 alter gemfile using sample-app-gemfile.railstutorial.org
+
+3 - pre-req with you are using Ruby 2.2.1 (incompatible with gems from tutorial) 
+	rvm upgrade 2.2.1 2.2.5
+
+4 - gem install rails
+
+5 - bundle install --without production
+
+# Git
+
+1 - git init
+2 - git add -A
+3 - git commit -m "Initialize Repository"
