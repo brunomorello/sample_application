@@ -135,3 +135,4 @@ Sample app - commandlines
 5 - In your master branch, merge the changes from static-pages to here
 6 - git merge static-pages
 7 - Push your changes in github
+8 - git push
