@@ -24,3 +24,17 @@ Sample app - commandlines
 8 - Create you project on GitHub
 9 - git remote add origin git@github.com:brunomorello/sample_application.git
 10 - git push -u origin master
+
+# Deploying - Production at Bluemix
+
+1 - bluemix api https://api.ng.bluemix.net
+2 - bluemix login -u bmorenos@br.ibm.com -o bmorenos@br.ibm.com -s dev
+3 - cf push "sample-application"
+
+# Create a new branch
+
+1 - git checkout -b static-pages
+
+# Create controllers
+
+1 - rails generate controller StaticPages home help
