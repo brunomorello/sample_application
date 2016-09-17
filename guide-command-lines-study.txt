@@ -126,3 +126,8 @@ Sample app - commandlines
 9 - Run guard again and see that there is no error
 
 # Commit changes
+
+1 - git add -A
+2 - git commit -m "Finish static pages"
+3 - Move to master branch and verify your files was changed to "Previous version" - commited at Master branch, remember we are working in a new branch (static-pages)
+4 - git checkout master
