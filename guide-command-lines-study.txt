@@ -38,3 +38,91 @@ Sample app - commandlines
 # Create controllers
 
 1 - rails generate controller StaticPages home help
+2 - git push -u origin static-pages
+
+# Testing a rollback from branch
+
+1 - rails destroy controller StaticPages home help
+2 - git checkout -f
+
+# Testing your controller from static pages
+
+1 - bundle exec rake test
+
+# Adding a different way to view errors on test (errors in red and ok in green)
+
+1 - Your gemfile should have:  gem 'minitest-reporters', '1.0.5'
+2 - open test_helper.rb
+3 - Add these lines after "require 'rails/test_help'" :
+	require 'minitest/reporters'
+	Minitest::Reporters.use!
+
+4 - Run " bundle exec rake test " and see the new changes
+
+# Using Guard test 
+
+1 - bundle exec guard init
+2 - bundle exec guard
+3 - Add a new test for "About Page" in YOUR_APP_controller_test.rb
+	  test "should get about" do
+    	get :about
+    	assert_response :success
+  	  end
+
+4 - Run all tests in guard and verify the error
+5 - Add the route for "About Page" in routes.rb
+	get 'static_pages/about'
+
+5.1 - Run guard again
+5.2 - A new error will be generated
+
+6 - Add "about" action in controller YOUR_APP_controller.rb
+	  def about
+  	  end
+
+6.1 - Run guard again
+6.2 - A new error will be generated
+
+7 - Create static page for "About"
+8 - cd YOUR_APPLICATION_PATH
+9 - touch app/views/YOUR_APPLICATION_CONTROLLER_NAME/about.html.erb
+9.1 - Run guard again
+9.2 - Success!! no error
+
+# Testing HTML from static pages
+
+1 - rename the application layout page
+	cd YOUR_APPLICATION_PATH
+	mv app/views/layouts/application.html.erb layout_file
+
+2 - Add the test section to verify if there is a Title called "PAGE-NAME | Sample Application"
+
+	Go to APPLICATION_CONTROLLER_controller_test.rb
+	2.1 - Insert the code above, after "assert_response :success"
+		assert_select "title", "About | Sample Application"
+
+3 - Run the guard(test) and see the erros
+
+4 - Add the html code to create the title for each page in your application
+
+	<% provide(:title, "About") %>
+	<!DOCTYPE html>
+	<html>
+		<head>
+			<title><%= yield(:title) %> | Sample Application</title>
+		</head>
+	<!-- another tags from your html -->
+
+5 - The HTML code above is the same for each page you have, lets use it in our application layout
+6 - mv layout_file app/views/layouts/application.html.erb
+7 - Add the dynamic title to application layout
+	7.1 - Remove the title provided by Ruby
+	7.2 - Add:
+		  <title>
+  			<%= yield(:title) %> | Sample Application
+  		  </title>
+
+8 - Remove the harded code from dynamic title from each page
+9 - Run guard again and see that there is no error
+
+# Commit changes
