@@ -136,3 +136,23 @@ Sample app - commandlines
 6 - git merge static-pages
 7 - Push your changes in github
 8 - git push
+
+# Creating a helper
+
+1 - open your application helper => app/helpers/application_helper.rb
+2 - Add this code, to generate a dynamic Title (page's name + application name)
+	# Returns the full titl eon  per page basis
+	def full_title(page_title = '')
+		base_title = "Sample Application"
+		if (page_title.empty?)
+			base_title
+		else
+			"#{page_title} | #{base_title}"
+		end
+	end
+
+3 - Change the application layout => app/views/layouts/application.html.erb
+	
+	<%= full_title(yield(:title)) %>
+
+4 - Remove the ruby tag from home(e.g.) and see the changes
