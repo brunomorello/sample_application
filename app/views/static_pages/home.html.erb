@@ -1,6 +1,14 @@
 <% provide(:title, "Home") %>
+<div class="center jumbotron">
+
+	<h1>Welcome to the Sample App</h1>
+
+	<h2>
+		Thanks for using Sampple Application. <br/>		
+	</h2>
+
+	<%= link_to "Sign up now!", "#", class: "btn btn-lg btn-primary" %>
+
+</div>
 	
-<h1>Sample App</h1>
-<p>
-	Testing a Static Page.
-</p>
+<%= link_to image_tag("rails-logo.svg", size: "78x80", alt: "Rails logo"), 'http://rubyonrails.org' %>
