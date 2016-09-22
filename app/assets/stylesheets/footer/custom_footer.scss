@@ -1,0 +1,37 @@
+/* Footer CSS - Copied from Rails Tutorial Video */
+
+footer {
+	margin-top: 45px;
+	padding-top: 5px;
+	border-top: 1px solid #eaeaea;
+	color: #777;
+
+	a {
+		color: #555;
+	}
+
+	&:hover {
+		color: #222;
+	}
+
+	small {
+		float:left;		
+	}
+
+	ul {
+		float:right;
+		list-style: none;
+		margin-top: -55px;
+		li {
+			float: left;
+			margin-left: 15px;
+		}
+	}
+}
+
+#ruby-logo {
+	margin-left: 540px;
+	margin-top: -45px;
+	height: 80px;
+	width: 80px;
+}

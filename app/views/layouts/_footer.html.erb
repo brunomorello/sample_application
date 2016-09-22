@@ -1,0 +1,17 @@
+<footer class="footer">
+	<smal>
+		Developed by <%= link_to "Bruno Moreno", "https://github.com/brunomorello/" %>
+	</small>
+
+<!-- Testing Ruby Logo on Footer -->
+	<div id="ruby-logo">
+		<%= link_to image_tag("rails-logo.svg", size: "78x80", alt: "Rails logo"), 'http://rubyonrails.org' %>
+	</div>
+
+	<nav>
+		<ul>
+			<li><%= link_to "About", about_path %></li>
+			<li><%= link_to "Contact", contact_path %></li>
+		</ul>
+	</nav>
+</footer>
