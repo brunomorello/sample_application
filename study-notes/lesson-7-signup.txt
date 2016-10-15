@@ -1,0 +1,63 @@
+1 - Create a box for debug mode at development environment
+
+	commandlines:
+		
+		git checkout -b sign-up	
+
+	At application.html.erb insert this after, "render" of the layouts/footer
+
+	<%= debug(params) if Rails.env.development? %>
+
+	Edit the .scss from footer and add these lines:
+
+	- at the begin of the file:
+
+		/* mixins, variables, etc */
+
+		@mixin box_sizing {
+			-moz-box-sizing:    border-box;
+			-webkit-box-sizing: border-box;
+			box-sizing:         border-box;
+		}		
+
+	- and add the correspondent css for debug box(.debug_dump is the class created by ruby - see source code in browser):
+
+		/* miscellaneous */
+
+		.debug_dump {
+			clear: both;
+			float: left;
+			width: 100%;
+			margin-top: 45px;
+			@include box_sizing;
+		}	
+
+2 - Make the Users Model works
+
+	2.1 - Try to see a User at http://localhost:3000/users/1 
+		Don't forget to create a User using rails console
+
+	2.2 - Add the resource of Users model at routes.rb
+		resources :users
+
+	2.3 - Create the action to show users in control
+
+		def show
+		end
+
+	2.4 - Create the view for show users
+
+		show.html.erb
+
+	###### IMPORTANT TIP: TO HELP YOU DEBUG, RAILS OFFER A FUNCTION CALLED debugger ######
+
+	2.5 - Improve the show view, creating a helper
+
+	UserHelper
+
+	# Returns the Gravatar for the given user
+	def gravatar_for(user)
+		gravatar_id = Digest::MD5::hexdigest(user.email.downcase)
+		gravatar_url = "https://secure.gravatar.com/#{gravatar_id}"
+		image_tag(gravatar_url, alt: user.name, class: "gravatar")
+	end	
