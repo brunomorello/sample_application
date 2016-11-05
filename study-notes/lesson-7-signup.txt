@@ -61,3 +61,142 @@
 		gravatar_url = "https://secure.gravatar.com/#{gravatar_id}"
 		image_tag(gravatar_url, alt: user.name, class: "gravatar")
 	end	
+
+3 - Building the Sign Up Form
+
+	3.1 - Create the Indexes and another things using this migration
+		rake db:migrate:reset
+
+	3.2 - Edit the new.html.erb page from Users and add a form_for like this:
+
+		<%= form_for(@user) do |f| %>
+
+			<%= f.label :name %>
+			<%= f.text_field :name %>
+
+			<%= f.label :email %>
+			<%= f.text_field :email %>
+
+			<%= f.label :password %>
+			<%= f.password_field :password %>
+
+			<%= f.label :password_confirmation %>
+			<%= f.password_field :password_confirmation %>
+
+			<%= f.submit "Create my account", class: "btn btn-primary" %>
+
+	3.3 - Edit the new action at users_controller.rb
+
+		  def new
+		  	@user = User.new
+		  end		
+
+4 - Handling Error with Unsuccessful Sign Up Users
+
+	4.1 - Create the Action to Create a User
+
+		  def create
+		  	@user = User.new(user_params)
+		  	if @user.save
+		  		# Handle a successful save
+		  	else
+		  		render 'new'
+		  	end
+		  end
+
+	4.2 - Create a Partial do handle Error (app/views/shared/_error_messages.html.rb)
+
+		<% if @user.errors.any? %>
+			<div id="error_explanation">
+				<div class="alert alert-danger">
+					The form contains <%= pluralize(@user.errors.count, "error") %>.
+				</div>
+
+				<ul>
+					<% @user.errors.full_messages.each do |msg| %>
+						<li><%= msg %></li>
+					<% end %>
+				</ul>
+			</div>
+		<% end %>		
+
+	4.2 - Add the Partial in new.html.erb, after form_for @user
+
+		<%= form_for(@user) do |f| %>
+
+			<!-- ### ALWAYS PUT <%= TO RENDER WORKS!! -->
+			<%= render 'shared/error_messages' %>	
+
+	4.3 - Add these lines to customcss
+
+		#error_explanation {
+			color: red;
+			ul {
+				color: red;
+				margin: 0 0 30px 0;
+			}
+		}
+
+		.field_with_errors {
+			@extend .has-error;
+			.form-control {
+				color: $state-danger-text;
+			}
+		}
+
+
+	4.4 - Create a Integration Test
+
+		rails generate integration_test users_signup
+
+		  test "invalid signup information" do
+		  	get signup_path
+
+		  	assert_no_difference 'User.count' do
+			  	post users_path, user: { name: "",
+			  	                         email:"user@inavalid",
+			  	                         password: "foo",
+			  	                         password_confirmation: "foo"}
+		  	end
+
+		  	assert_template 'users/new'
+		  end		
+
+5 - Handle a Success Save
+
+	5.1 - Edit the create action in Users Controller
+
+	  	@user = User.new(user_params)
+	  	if @user.save
+	  		# Handle a successful save
+
+	  		flash[:success] = "Welcome to the Sample App!"
+	  		#redirect_to user_url(@user) - It Works too
+	  		redirect_to @user
+	  	else
+	  		render 'new'
+	  	end
+	  end
+
+
+	5.2 - Add the hash Flash in application.html.erb, after div="container"
+
+      <% flash.each do |message_type, message| %>
+        <div class="alert alert-<%= message_type %>"> <%= message %> </div>
+      <% end %>
+
+    5.3 - Create a Test for Successful Signup
+
+	  test "valid signup information" do
+	  	get signup_path
+
+	  	assert_difference 'User.count', 1 do
+		  	post_via_redirect users_path, user: { name: "Example User",
+		  	                         email:"user@example.com",
+		  	                         password: "password",
+		  	                         password_confirmation: "password"}
+	  	end
+
+	  	assert_template 'users/show'
+	  end    
+

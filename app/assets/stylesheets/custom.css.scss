@@ -1,6 +1,14 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+/* mixins, variables, etc */
+
+@mixin box_sizing {
+	-moz-box-sizing:    border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing:         border-box;
+}
+
 /* Universal */
 
 html {
@@ -85,6 +93,8 @@ aside {
 	}
 }
 
+/* Used by gravatar function */
+
 .gravatar {
 	float: left;
 	margin-right: 10px;	
@@ -92,4 +102,99 @@ aside {
 
 .gravatar_edit {
 	margin-top: 15px;
+}
+
+/* forms */
+
+input, textarea, select, .uneditable-input {
+	border: 1px solid #bbb;
+	width: 100%;
+	margin-bottom: 15px;
+	@include box_sizing;
+}
+
+input {
+	height: auto !important;
+}
+
+#error_explanation {
+	color: red;
+	ul {
+		color: red;
+		margin: 0 0 30px 0;
+	}
+}
+
+.field_with_errors {
+	@extend .has-error;
+	.form-control {
+		color: $state-danger-text;
+	}
+}
+
+/* Footer CSS - Copied from Rails Tutorial Video */
+
+footer {
+	margin-top: 45px;
+	padding-top: 5px;
+	border-top: 1px solid #eaeaea;
+	color: #777;
+
+	a {
+		color: #555;
+	}
+
+	&:hover {
+		color: #222;
+	}
+
+	small {
+		float:left;		
+	}
+
+	ul {
+		float:right;
+		list-style: none;
+		margin-top: -55px;
+		li {
+			float: left;
+			margin-left: 15px;
+		}
+	}
+}
+
+#ruby-logo {
+	margin-left: 540px;
+	margin-top: -45px;
+	height: 80px;
+	width: 80px;
+}
+
+/* miscellaneous */
+
+.debug_dump {
+	clear: both;
+	float: left;
+	width: 100%;
+	margin-top: 45px;
+	@include box_sizing;
+}
+
+/* Header CSS - Copied from Rails Tutorial Video */
+
+#logo {
+	float: left;
+	margin-right: 10px;
+	font-size: 1.7em;
+	color: #fff;
+	text-transform: uppercase;
+	letter-spacing: -1px;
+	padding-top: 9px;
+	font-weight: bold;	
+
+	/*This Section is the same #logo:hover */
+	&:hover {
+		color: #fff;
+		text-decoration: none;	
+	}
 }

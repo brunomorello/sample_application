@@ -3,6 +3,8 @@ ruby "2.2.5"
 
 # Gems from Railstutorial - safaribooks
 # sample-app-gemfile.railstutorial.org
+# To Deploy this in Production, comment sqlite3 in delevopment group
+# and uncomment sqlite3 above
 
 gem 'rails',                   '4.2.2'
 gem 'bcrypt',                  '3.1.7'
@@ -19,6 +21,7 @@ gem 'coffee-rails',            '4.1.0'
 gem 'jquery-rails',            '4.0.3'
 gem 'turbolinks',              '2.3.0'
 gem 'jbuilder',                '2.2.3'
+#gem 'sqlite3',                 '1.3.9'
 gem 'sdoc',                    '0.4.0', group: :doc
 
 group :development, :test do
