@@ -1,0 +1,52 @@
+# Lesson 8 - Login-Logout and Sessions
+
+	1 - Create a controller for Sessions
+
+		rails generate controller Sessions new
+
+	2 - Create Named Routes for Sessions (routes.rb)
+
+		get 'login'     => 'sessions#new'
+		post 'login'    => 'sessions#create'
+		delete 'logout' => 'sessions#destroy' 
+
+	3 - Copy the new.html.erb from Users' View and adjust somethings. 
+
+		sessions/new.html.erb has email, password, login button and a link to new users.
+
+	4 - Create some actions in controller (there is a bug with flash message)
+
+		  def create
+		  	user = User.find_by(email: params[:session][:email])
+
+		  	if user && user.authenticate(params[:session][:password])
+		  		# Log the user in and redirect to the user's show page
+		  	else
+		  		# Create an error message
+		  		flash[:warning] = 'Invalid email/password combination'
+		  		render 'new'  	
+		  	end
+		  end
+
+		  def destroy
+		  end	
+
+	5 - Create integration tests for Login
+
+		rails generate integration_test users_login
+
+		Add theses lines on users_login_test.rb
+
+			  test "login with invalid information" do
+			  	get login_path
+			  	assert_template "sessions/new"
+			  	post login_path, session: { email: "", password: "" }
+			  	assert_template "sessions/new"
+			  	assert_not flash.empty?
+			  	get root_path
+			  	assert flash.empty?  	
+			  end		
+
+	6 - Fix create action, to invalid login
+
+		change flash[:warning] = 'Inva....' to flash.now[:warning] = 'Inval....'
