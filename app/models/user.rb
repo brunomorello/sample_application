@@ -13,4 +13,12 @@ class User < ActiveRecord::Base
 
 	has_secure_password
 	validates :password, length: { minimum: 6 }
+
+	# Encrypt the default password used in Users Fixture for Users Login Test
+	# This method was copied by Rails Tutorial - Safari Books
+	def User.digest(string)
+		cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+													  BCrypt::Engine.cost
+		BCrypt::Password.create(string, cost: cost)
+	end
 end

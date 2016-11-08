@@ -1,0 +1,66 @@
+# Lesson 8 - Login-Logout and Sessions - Login
+
+	1 - Include the SessionsHelper at application_controller, it should be available to all system
+
+		include SessionsHelper
+
+	2 - Add the login method in Sessions Controller
+
+		  	if user && user.authenticate(params[:session][:password])
+  			# Login the user in and redirect to the user's show page
+      			log_in user
+      			redirect_to user
+
+    3 - Add some methods in SessionHelper
+
+		# Logs in the given user.
+		def log_in(user)
+			session[:user_id] = user.id
+		end
+
+		# Returns the current logged-in user(if any)
+		def current_user
+			# Following the Ruby Convetion - Uses Memoization
+			@current_user ||= User.find_by(id: session[:user_id])
+
+			# The line above is the same:
+			# @current_user = @current_user || User.find_by(id: session[:user_id])
+			# if @current_user.nil?
+			# 	@current_user = User.find_by(id: session[:user_id])
+			# else 
+			# 	@current_user
+			# end
+		end
+
+		# Returns true if the user is logged-in
+		def logged_in?
+			!current_user.nil?
+		end	
+
+	4 - Edit the Header's Layout Helper
+
+		<!-- Add these lines before <li><%= link_to "Help", help_path %></li> -->
+        <% if logged_in? %>
+
+        <li><%= link_to "Users", '#' %></li>
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                Account <b class="caret"></b>
+            </a>
+            <ul class="dropdown-menu">
+                <li><%= link_to "Profile", current_user %></li>
+                <li><%= link_to "Settings", '#' %></li>
+
+                <li class="divider"></li>
+
+                <li><%= link_to "Logout", logout_path %></li>
+            </ul>
+        </li>
+
+        <% else %>
+            <li><%= link_to "Login", "#" %></li>
+        <% end %>	    	
+
+    5 - Add the JQuery Bootstrap in app/assets/javascripts/applications.js
+
+    	//= require bootstrap
