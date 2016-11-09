@@ -1,0 +1,39 @@
+# Lesson 8 - Login-Logout and Sessions - Logout
+
+	1 - Create the Log Out Method in Sessions Helper - sessions_helper.rb
+
+		# Logs out the current user
+		def log_out	
+			session.delete(:user_id)
+			@current_user = nil
+		end
+
+	2 - Add these lines in destroy action - Sessions Controller - sessions_controller 
+
+		  def destroy
+		    log_out
+		    redirect_to root_url
+		  end
+
+	3 - Change the integration tests for login, adding the logout action - users_login_test.rb
+
+	  test "login with valid information followed by logout" do
+	    get login_path
+	    post login_path, session: { email: @user.email, password: 'password' }
+
+	    # is_logged_in exists in test_helper.rb
+	    assert is_logged_in?
+	    assert_redirected_to @user
+	    follow_redirect!
+	    assert_template 'users/show'
+	    assert_select "a[href=?]", login_path, count: 0
+	    assert_select "a[href=?]", logout_path
+	    assert_select "a[href=?]", user_path(@user)
+	    delete logout_path
+	    assert_not is_logged_in?
+	    assert_redirected_to root_url
+	    follow_redirect!
+	    assert_select "a[href=?]", login_path
+	    assert_select "a[href=?]", logout_path, count: 0
+	    assert_select "a[href=?]", user_path(@user), count: 0
+	  end	

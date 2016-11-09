@@ -1,0 +1,55 @@
+# Lesson 8 - Login-Logout and Sessions - Remember me token and login
+
+	1 - Create a new column at Users Table to store the Remember Token
+
+		rails generate migration add_remember_digest_to_users remember_digest:string
+
+		rake db:migrate
+
+	2 - Create a method called remember in sessions_helper.rb
+
+		# Remembers a user in a persistent session
+		def remember(user)
+			user.remember
+			#cookies[:user_id] = { value: user.id, expires: 20.years.from_now.utc }
+			cookies.permanent.signed[:user_id] = user.id
+			cookies.permanent[:remember_token] = user.remember_token
+		end
+
+	3 - Change the method - current_user in sessions_helper.rb
+
+	def current_user
+
+		if (user_id = session[:user_id])
+			@current_user ||= User.find_by(id: user_id)
+		elsif (user_id = cookies.signed[:user_id])
+			user = User.find_by(id: user_id)
+			if user && user.authenticated?(cookies[:remember_token])
+				log_in user
+				@current_user = user
+			end
+		end				
+	end
+
+	4 - Now, we need to create some methods in Users Model
+
+		Methods to generate a token, remember user and verify if the current user is authenticated
+
+			# Attribute Accessor for Remember Token
+			attr_accessor :remember_token		
+
+			# Returns a random token
+			def User.new_token
+				SecureRandom.urlsafe_base64
+			end
+
+			# Remembers a user in the database for use in persistent sessions
+			def remember
+				self.remember_token = User.new_token
+				update_attribute(:remember_digest, User.digest(remember_token))
+			end
+
+			# Returns true if the given token matches the digest
+			def authenticated?(remember_token)
+				BCrypt::Password.new(remember_digest).is_password?(remember_token)
+			end		
