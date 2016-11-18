@@ -1,0 +1,68 @@
+Updating Users
+	
+	1 - Create the edit page, touch sample_app/app/views/users/edit.html.erb
+	2 - Copy the source code from new.html.erb to edit.html.erb
+	3 - Just add the code to change your gravatar:
+		<div class="gravatar_edit">
+			<%= gravatar_for @user %>
+			<a href="http://gravatar.com/emails" target="_blank">Change</a>
+		</div>		
+
+	4 - Add the Edit Action in Controller - users_controller.rb
+
+		def edit
+			@user = User.find(params[:id])
+		end
+
+	5 - Modify the link_to for User Settings in _header.html.erb
+
+		from: <li><%= link_to "Settings", '#' %></li>
+		to:   <li><%= link_to "Settings", edit_user_path(current_user) %></li>
+
+	6 - Add the Update Action in Controller - users_controller.rb
+
+		def update
+			@user = User.find(params[:id])
+			if @user.update_attributes(user_params)
+			    flash[:success] = "Profile Updated"
+			    redirect_to @user
+			else
+				render 'edit'
+			end
+		end
+
+	7 - Create the Integration Tests for Users Edit - rails generate integration_test users_edit
+
+	  def setup
+	  	@user = users(:bruno)
+	  end
+
+	  test "unsuccessful edit" do
+	  	get edit_user_path(@user)
+	  	patch user_path(@user), user: { name: "",
+	  	                               email: "user@invalid", 
+	  	                               password: "foo",
+	  	                               password_confirmation: "bar" }
+	  	assert_template 'users/edit'
+	  end
+
+	  test "successful edit" do
+	  	get edit_user_path(@user)
+	  	name = "Foo Bar"
+	  	email = "foo@bar.com"
+	  	patch user_path(@user), user: { name: name, 
+	  	                                email: email,
+	  	                                password: "", 
+	  	                                password_confirmation: "" }
+	  	assert_not flash.empty?
+	  	assert_redirected_to @user
+	  	@user.reload
+	  	assert_equal @user.name, name
+	  	assert_equal @user.email, email
+	  end
+
+	8 - Add a new parameter in Users model - app/models/user.rb to allow blank password (it works only to update user's attributes)
+
+		from: validates :password, length: { minimum: 6 }
+		to:   validates :password, length: { minimum: 6 }, allow_blank: true
+

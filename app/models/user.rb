@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
 		uniqueness: true
 
 	has_secure_password
-	validates :password, length: { minimum: 6 }
+	validates :password, length: { minimum: 6 }, allow_blank: true
 
 	# Attribute Accessor for Remember Token
 	attr_accessor :remember_token
