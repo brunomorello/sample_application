@@ -1,0 +1,40 @@
+Authorization
+
+If you try to access the URL: http://localhost:3000/users/3/edit, the application will return the content of user 3. Its a gap in the application's security
+
+	1 - Implements the Integrated Tests:
+
+	  test "should redirect edit when not logged in" do
+	  	get :edit, id: @user
+	    assert_not flash.empty?
+	  	assert_redirected_to login_url
+	  end
+
+	  test "should redirect update when not logged in" do
+	  	patch :update, id: @user, user: { name: @user.name, email: @user.email }
+	    assert_not flash.empty?
+	  	assert_redirected_to login_url
+	  end
+
+	  test "should redirect edit when logged in as wrong user" do
+	  	log_in_as(@another_user)
+	  	get :edit, id: @user
+	    assert flash.empty?
+	  	assert_redirected_to root_url
+	  end
+
+	  test "should redirect update when logged in as wrong user" do
+	  	log_in_as(@another_user)
+	  	patch :update, id: @user, user: { name: @user.name, email: @user.email }
+	    assert flash.empty?
+	  	assert_redirected_to root_url
+	  end	
+
+	2 - Create a new method in sessions_helper.rb
+
+		# Returns true if the given user is the current user.
+		def current_user?(user)
+			user == current_user
+		end	
+
+	3 - 
