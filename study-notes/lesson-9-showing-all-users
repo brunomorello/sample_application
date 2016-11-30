@@ -1,0 +1,110 @@
+Showing All Users
+
+	1 - Change the users_controller.rb - Add the index action and modify before_action for logged in user
+
+  	before_action :logged_in_user, only: [:index, :edit, :update]			
+
+	  def index
+	    @users = User.paginate(page: params[:page])
+	  end
+
+	2 - Create the Index view for Users - index.html.erb
+
+		<% provide(:title, 'All Users') %>
+
+		<h1>All Users</h1>
+
+		<%= will_paginate %>
+
+		<ul class="users">
+			<% @users.each do |user| %>
+				<!-- Using Partial -->
+				<%= render user %>	
+			<% end %>
+		</ul>
+
+		<%= will_paginate %>	
+
+	2.1 - Create the Partial for Users View - _user.html.erb - app/views/users
+
+		<li>
+			<%= gravatar_for user, size: 50 %>
+			<%= link_to user.name, user %>
+		</li>
+
+	2.2 - Modify custom.css.scss for ul.users - app/views/users/index.html.erb
+
+		/* Users Index */
+		.users {
+			list-style: none;
+			margin: 0;
+			li {
+				overflow: auto;
+				padding: 10px 0;
+				border-bottom: 1px solid $gray-lighter;
+			}
+		}
+
+	3 - Add the test bellow in users_controller_test.rb
+
+	  test "should redirect index when not logged in" do
+	    get :index
+	    assert_redirected_to login_url
+	  end
+
+	4 - Create the Users' seed for database - seeds.rb
+
+		User.create!(name:  "Example User",
+			         email: "example@test.com",
+			         password:              "foobar",
+			         password_confirmation: "foobar")
+
+		99.times do |n|
+			name = Faker::Name.name
+			email = "example-#{n+1}@test.com"
+			password = "password"
+
+			User.create!(name:  name,
+				         email: email,
+				         password:              password,
+				         password_confirmation: password)
+		end
+
+	4.1 - Change the users.yml - it is for a new integration test
+
+		bruno:
+		    name: Bruno Example
+		    email: bruno@example.com
+		    password_digest: <%= User.digest('password') %>
+
+		archer:
+		    name: Sterling Archer
+		    email: duchess@example.gov
+		    password_digest: <%= User.digest('password') %>
+
+		<% 30.times do |n| %>
+		user_<%= n %>:
+		    name: <%= "User #{n}" %>
+		    email: <%= "example-#{n}@example.com" %>
+		    password_digest: <%= User.digest('password') %>
+		<% end %>
+
+	5 - Create the users_index integration test:
+
+		rails generate integration_test users_index
+
+	5.1 - Add the setup and a new test
+
+		  def setup
+		  	@user = users(:bruno)
+		  end
+
+		  test "index including pagination" do
+		  	log_in_as(@user)
+		  	get users_path
+		  	assert_template 'users/index'
+		  	assert_select 'div.pagination'
+		  	User.paginate(page: 1).each do |user|
+		  		assert_select 'a[href=?]', user_path(user), text: user.name
+		  	end
+		  end		
