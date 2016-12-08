@@ -1,1 +1,47 @@
 Lesson 10 - Account Activations
+
+1 - rails generate controller AccountActivations edit --no-test-framework
+
+2 - Add a new route on routes.rb
+	resources :account_activations, only: [:edit]
+
+3 - Create a User Migration to add activation_digest:string, activated:boolean, activated_at:datetime on Users table:
+
+	rails generate migration add_activation_to_users activation_digest:string activated:boolean activated_at:datetime
+
+3.1 - On the migration file, add the argument default: false on column "activated"
+
+3.2 - bundle exec rake db:migrate / rake db:migrate
+
+4 - Modify the Users Model
+
+4.1 - Add on callbacks section the method before_create and modify before_save:
+
+	before_create :create_activation_digest
+	before_save :downcase_email
+
+4.2 - Create the private method for create_activation_digest and downcase_email:
+
+	private
+
+        # Converts email to all lower-case
+        def downcase_email
+            self.email = email.downcase
+        end
+
+        # Creates and assigns the activation token and digest.
+        def create_activation_digest
+            self.activation_token = User.new_token
+            self.activation_digest = User.digest(activation_token)
+        end
+
+5 - Modify the seeds.rb and users.yml, adding activated = true and activated_at = current timestamp
+
+	activated: true
+	activated: Time.zone.now
+
+5.1 - Reset database and feed it
+
+	rake db:migrate:reset
+	rake db:seed
+
