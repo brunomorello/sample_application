@@ -1,0 +1,61 @@
+Activating the Accouunt
+
+1 - Lets create our AccountActivations
+
+	rails destroy controller AccountActivations
+
+1.1 - rails generate controller AccountActivations
+
+2 - Add the edit action:
+
+	def edit
+		user = User.find_by(email: params[:email])
+		if user && user.authenticated(:activation, params[:id])
+			# activate the user
+		else
+			# handle invalid link
+		end
+	end
+
+3 - Modify the method authenticated? from user.rb
+
+	def authenticated?(attribute, token)
+		digest = self.send("#{attribute}_digest")		
+		return false if digest.nil?
+		BCrypt::Password.new(digest).is_password?(token)
+	end
+
+3.1 - Run Guard tests to see the lines that need to be fixed
+
+4 - Improve the edit action:
+
+	def edit
+		user = User.find_by(email: params[:email])
+		if user && !user.activated? && user.authenticated(:activation, params[:id])
+			# Activate the user
+			user.update_attribute(:activated, true)
+			user.update_attribute(:activated_at, Time.zone.now)
+			log_in user
+			flash[:success] = "Account Activated!"
+			redirect_to user
+		else
+			# handle invalid link
+			flash[:danger] = "Invalid activation link"
+			redirect_to root_url
+		end
+	end
+
+5 - Modify the sessions_controller.rb to avoid new users can login with activate their account
+
+      if user.activated?
+        log_in user
+        params[:session][:remember_me] == '1' ? remember(user) : forget(user)
+        redirect_back_or user
+      else
+        message = "Account not activated"
+        message += "Check your email for the activation link."
+        flash[:warning] = message
+        redirect_to root_url
+      end
+
+6 - To do -> write the integration tests
