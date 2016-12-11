@@ -1,0 +1,99 @@
+Account Activation mailer method
+
+1 - rails generate mailer UserMailer account_activation password_reset
+
+2 - Define a default email on user_mailer.rb
+
+	default from: "noreplay@example.com"
+
+2.1 - Change the method account_activation on user_mailer.rb
+
+	def account_activation(user)
+	@user = user
+
+	mail to: user.email, subject: "Account Activation"
+	end
+
+3 - Create the body of the email for Account Activation	
+
+	## account_activation.text.erb:
+
+	Hi <%= @user.name %>,
+
+	Welcome to the SampleApp! Click on the link bellow to activate you account:
+
+	<%= edit_account_activation_url(@user.activation_token, email: @user.email) %>
+
+	## account_activation.html.erb
+
+	<h1>SampleApp</h1>
+
+	<p>
+		Hi <%= @user.name %>,
+	</p>
+
+	<p>
+	  Welcome to the SampleApp! Click on the link bellow to activate you account:
+	</p>
+
+	<%= link_to "Activate", edit_account_activation_url(@user.activation_token, email: @user.email) %>
+
+4 - Configure your development and test environment to send emails - /home_app/config/environments/development.rb:
+
+	### development.rb
+
+	# Don't care if the mailer can't send.
+	config.action_mailer.raise_delivery_errors = true
+	config.action_mailer.delivery_method = :test
+	host = 'localhost:3000'
+	config.action_mailer.default_url_options = { host: host }
+
+	### test.rb
+
+	config.action_mailer.delivery_method = :test
+	config.action_mailer.default_url_options = { host: 'example.com' }
+
+	***** Restart the server after the setup
+
+5 - Modify the method account_activation on user_mailer_preview.rb
+
+	def account_activation
+		user = User.first
+		user.activation_token = User.new_token
+	UserMailer.account_activation(user)
+	end
+
+6 - Improve the user_mailer_test.rb
+
+	class UserMailerTest < ActionMailer::TestCase
+	  test "account_activation" do
+	    user = users(:bruno)
+	    user.activation_token = User.new_token
+	    mail = UserMailer.account_activation(user)
+	    assert_equal "Account Activation", mail.subject
+	    assert_equal [user.email], mail.to
+	    assert_equal ["noreplay@example.com"], mail.from
+	    assert_match user.name, mail.body.encoded
+	    assert_match user.activation_token, mail.body.encoded
+	    assert_match CGI::escape(user.email), mail.body.encoded
+	  end
+
+7 - Modify the create action on users_controller.rb
+
+	def create
+		@user = User.new(user_params)
+		if @user.save
+			# Handle a successful save
+	  		UserMailer.account_activation(@user).deliver_now
+			flash.now[:info] = "Please check your email to activate your account."
+			#redirect_to user_url(@user) - It Works too
+	  		redirect_to root_url
+		else
+			render 'new'
+		end
+	end
+
+7.1 - Action was changed, so for now I'll comment the test but this have to be fixed
+
+	#assert_template 'users/show'
+	#assert is_logged_in?
