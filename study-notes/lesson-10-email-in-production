@@ -1,0 +1,30 @@
+Lesson 10 Email in Production
+
+1 - Add these lines on ./config/environments/production.rb
+
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.delivery_mode = :smtp
+    host = '<your-app>.provider.com'
+    config.action_mailer.default_url_options = { host = host }
+    ActionMailer::Base.smtp_settings = {
+        :address            => 'smtp.sendgrid.net',
+        :port               => '587',
+        :authentication     => :plain,
+        :user_name          => ENV['SENDGRID_USERNAME'],
+        :password           => ENV['SENDGRID_PASSWORD'],
+        :domain             => 'mybluemix.net'
+        :enable_starttls_auto => true
+    }
+
+2 - Run the Integration Tests and Deploy your application in Production
+
+
+help to implement send grind on bluemix
+
+http://stackoverflow.com/questions/33584808/does-ibm-bluemix-have-some-sort-of-incoming-or-inbound-email-service-or-apis
+
+https://www.ibm.com/blogs/bluemix/2016/12/using-sendgrid-easy-sending-email/
+
+https://www.ibm.com/developerworks/community/blogs/2f9ef931-1ac3-4d9b-a8ca-6e3f01b13889/entry/sending_email_made_easy_in_ibm_bluemix?lang=pt_br
+
+http://stackoverflow.com/questions/33584808/does-ibm-bluemix-have-some-sort-of-incoming-or-inbound-email-service-or-apis
