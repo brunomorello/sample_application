@@ -70,8 +70,8 @@ Rails.application.configure do
     :address          => 'smtp.sendgrid.net',
     :port             => '587',
     :authentication   => :plain,
-    :user_name        => 'bmorenos',
-    :password         => '75738062AB',
+    :user_name        => ENV['SENDGRID_ID'],
+    :password         => ENV['SENDGRID_PASSWORD'],
     :domain           => 'mybluemix.net',
     :enable_starttls_auto => true
   }

@@ -30,3 +30,7 @@ https://www.ibm.com/developerworks/community/blogs/2f9ef931-1ac3-4d9b-a8ca-6e3f0
 http://stackoverflow.com/questions/33584808/does-ibm-bluemix-have-some-sort-of-incoming-or-inbound-email-service-or-apis
 
 3 - Environment configured and working
+
+    3.1 - Seting Environemnt Variable 
+        cf set-env sample-app-bruno SENDGRID_ID bmorenos 
+        cf set-env sample-app-bruno SENDGRID_PASSWORD ******        
