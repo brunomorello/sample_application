@@ -1,5 +1,8 @@
 class User < ActiveRecord::Base
 
+	# Associations
+	has_many :microposts, dependent: :destroy
+
 	# Callbacks
 	before_save :downcase_email
 	before_create :create_activation_digest

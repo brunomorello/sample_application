@@ -1,1 +1,85 @@
 Lesson 11 - Micropost Model
+
+1 - Create the Model for Micropost
+    
+    rails generate model Micropost content:text user:references
+
+1.1 - Add a multiple key index in migrationfile
+
+    add_index :microposts, [:user_id, :created_at]
+
+1.2 - Run Migration
+
+    rake db:migrate
+
+2 - A user may have many microposts, so add the relationship in User Model - app/models/user.rb
+
+    has_many :microposts, dependent: destroy
+
+3 - Write some tests for Microposts
+
+    def setup
+        # :bruno is defined in fixtures
+        @user = users(:bruno)
+        @micropost = @user.microposts.build(content: "test content")
+    end
+
+    test "should be valid" do
+        assert @micropost.valid?
+    end
+
+    test "user id should be present" do
+        @micropost.user_id = nil
+        assert_not @micropost.valid?
+    end
+
+    test "content should be present" do
+        @micropost.content = "  "
+        assert_not @micropost.valid?
+    end
+
+    test "content should be at most 140 characters" do
+        @micropost.content = "a" * 141
+        assert_not @micropost.valid?
+    end
+
+    test "order should be most recent first" do
+        assert_equal Micropost.first, microposts(:most_recent)
+    end
+
+4 - Create validations on Micropost Model - app/models/micropost.rb
+
+    # Use Staby Lambda
+    default_scope -> { order(:created_at) }
+
+    # Validations
+    validates :user_id, presence: true
+    validates :content, presence: true, length: { maximum: 140 }    
+
+5 - Create Micropost Fixture
+
+    orange:
+        content: "I just ate an orange"
+        created_at: <%= 10.minutes.ago %>
+
+    my_app_bluemix:
+        content: "My Ruby on Rails application running on IBM Bluemix Plataform - https://sample-app-bruno.mybluemix.net/"
+        created_at: <%= 3.years.ago %>
+
+    cat_video:
+        content: "Sad cats are sad: http://youtu.be/PKffm2uI4dk"
+        created_at: <%= 2.hours.ago %>
+
+    most_recent:
+        content: "Writing a short test"
+        created_at: <%= Time.zone.now %>
+
+6 - Create a test in user_test - to validate if the microposts are deleted when the user is deleted
+    
+      test "associated microposts should be destroyed when user is destroyed" do
+        @user.save
+        @user.microposts.create!(content: "test")
+        assert_difference 'Micropost.count', -1 do
+          @user.destroy
+        end
+      end    
