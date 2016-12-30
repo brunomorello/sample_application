@@ -1,0 +1,136 @@
+Lesson 10 Showing Microposts
+
+1 - Create Controller of Microposts
+
+    rails generate controller Microposts
+
+2 - Create Partial of Microposts - app/views/microposts/_micropost.html.erb - and add the lines below
+
+    <li id="micropost-<%= micropost.id %>">
+        <%= link_to gravatar_for(micropost.user, size: 50), micropost.user %>
+
+        <span class="user">
+            <%= link_to micropost.user.name, micropost.user %>
+        </span>
+
+        <span class="content">
+            <%= micropost.content %>
+        </span>
+
+        <span class="timestamp">
+            <!-- the function 'time_ago_in_words' is native from ruby -->
+            Posted <%= time_ago_in_words(micropost.created_at) %> ago.
+        </span>
+    </li>    
+    
+3 - Create the show of Microposts on app/views/users/show.html.erb
+
+    3.1 - Modify the Show Action for Users, adding the paginate for microposts
+
+      def show
+        @user = User.find(params[:id])
+        @microposts = @user.microposts.paginate(page: params[:page])
+      end
+
+    3.2 - implement show microposts 
+
+        <!-- existent tags -->
+
+        </aside>
+
+        <div class="col-md-8">
+            <% if @user.microposts.any? %>
+
+                <h3> Microposts (<%= @user.microposts.count %>) </h3>
+
+                <ol class="microposts">
+                    <%= render @microposts %>
+                </ol>
+
+                <!-- Paginate with Ruby -->
+                <%= will_paginate @microposts %>
+            <% end %>
+        </div>
+
+    3.3 - Add Microposts on db/seeds.rb
+
+        users = User.order(:created_at).first(6)
+
+        50.times do
+            content = Faker::Lorem.sentence(5)
+            users.each { |user| user.microposts.create!(content: content) }
+        end    
+
+    3.3.1 - Reset DB and seed DB
+
+        rake db:migrate:reset
+        rake db:seed
+
+    3.4 - Add some CSS to improve the show - custom.css.scss
+
+    /* Microposts */
+    .microposts {
+        list-style: none;
+        padding: 0;
+        li {
+            padding: 10px 0;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .user {
+            margin-top: 5em;
+            padding-top: 0;
+        }
+
+        .content {
+            display: block;
+            margin-left: 60px;
+            img {
+                display: block;
+                padding: 5px 0;
+            }
+        }
+
+        .timestamp {
+            color: $gray-light;
+            display: block;
+            margin-left: 60px;
+        }
+
+        .gravatar {
+            float: left;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+    }
+
+    aside {
+        textarea {
+            height: 100px;
+            margin-bottom: 5px;
+        }
+    }
+
+    span.picture {
+        margin-top: 10px;
+        input {
+            border: 0;
+        }
+    }
+
+
+4 - Generate an Integration Test for Users Profile
+
+    rails generate integration_test users_profile
+
+
+    4.1 - Add 30 microposts to micropost.yml
+
+        <% 30.times do |n| %>
+            content: <%= Faker::Lorem.sentence(5) %>
+            created_at: <%= 42.days.ago %>
+        <% end %>
+
+    4.2 - Write some tests
+
+        
