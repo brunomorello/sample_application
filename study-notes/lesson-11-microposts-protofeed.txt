@@ -1,0 +1,127 @@
+Lesson 11 Microposts and a Proto-feed
+
+1 - Implement Create action
+
+    def create
+        @micropost = current_user.microposts.build(micropost_params)
+        if @micropost.save
+            flash[:sucess] = "Micropost created!"
+            redirect_to root_url
+        else
+            # it is temporary
+            @feed_items = []
+            render 'static_pages/home
+        end
+    end    
+
+    def destroy
+    end
+
+    private
+
+        def micropost_params
+            params.require(:micropost).permit(:content)
+        end
+
+2 - Change the content from home.html.erb
+
+    <% if logged_in? %>
+
+        <div class="row">
+            <aside class="col-md-4">
+                <section class="user_info">
+                    <%= render 'shared/user_info' %>
+                </section>
+                    <%= render 'shared/micropost_form' %>
+                <section 
+            </aside>
+        </div>
+
+    <% else %>
+
+        <%= provide(:title, "Home") %>
+
+        <div class="center jumbotron">
+
+            <h1>Welcome to the Sample App</h1>
+
+            <h2>
+                Thanks for using Sampple Application. <br/>     
+            </h2>
+
+            <%= link_to "Sign up now!", signup_path, class: "btn btn-lg btn-primary" %>
+
+        </div>
+
+    <% end %>        
+
+3 - Change the shared error messages to receive an object instead of an specific object
+
+    replace @user for object
+
+    3.1 - replace every file that render shared error messages to send an object as parameter, like that:
+
+        <%= render 'shared/error_messages', object: f.object %>
+
+
+4 - Write the partial for user_info and micropost_form
+
+    4.1 - _user_info.html.erb
+
+        <%= link_to gravatar_for(current_user, size: 50), current_user %>
+
+        <h1> <%= current_user.name %> </h1>
+
+        <span> <%= link_to 'view my profile', current_user %> </span>
+        <span> <%= pluralize(current_user.microposts.count, "micropost") %> </span>    
+
+    4.2 - _micropost_form.html.erb
+
+        <%= form_for(@micropost) do |f| %>
+            <%= render 'shared/error_messages', object: f.object %>
+
+            <div class="field">
+                <%= f.text_area :content, placeholder: "Compose new micrpost..." %>
+            </div>
+
+            <%= f.submit "Post", class: "btn btn-primary" %>
+        <% end %>
+
+5 - Modify the static_pages_controller.rb
+
+      def home
+        if logged_in?
+            @micropost = current_user.microposts.build
+            @feed_items = current_user.feed.paginate(page: params[:page])
+        end
+      end
+
+    5.1 - Create the feed method on Users Model app/models/user.rb
+
+        # Defines a proto-feed
+        # See "Following users" for the full implementation
+        def feed
+            Micropost.where("user_id = ?", id)
+        end    
+
+6 - Create the proto-feed on home page - put it after aside tag
+
+    <div class="col-md-8">
+        <h3>Micropost Feed</h3>
+        <%= render 'shared/feed'%>
+    </div>
+
+
+    6.1 - Create a partial for feed on shared views - app/views/shared/_feed.html.erb
+
+        <% if @feed_items.any? %>
+            <ol class="microposts">
+                <%= render @feed_items %>
+            </ol>
+            <%= will_paginate @feed_items %>
+        <% end %>
+
+        It is very strange, because we didnt create a partial for feed_items, so how can ruby render it?
+
+        - Ruby looks for the object received (see the feed method - it returns a collect of microposts) and use the
+            micropost partial to render it!

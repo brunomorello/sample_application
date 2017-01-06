@@ -1,0 +1,46 @@
+Lesson 10 Manipulating Microposts
+
+1 - Create a Route for Micropost allowing only create and destroy
+
+    resources :microposts, only: [:create, :destroy]
+
+2 - Move the logged_in_user filter from users_controller to application_controller
+
+  # Confirms a logged-in user.
+  def logged_in_user
+    unless logged_in?
+      store_location
+      flash[:danger] = "Please log in."
+      redirect_to login_url
+    end
+  end
+
+3 - Write some tests for microposts_controller_test
+
+    def setup
+        @micropost = microposts(:orange)    
+    end
+
+    test "should redirect create when not logged in" do
+        assert_no_difference 'Micropost.count' do
+            post :create, micropost: { content: "Lorem ipsum" }
+        end
+        assert_redirected_to login_url
+    end
+
+    test "should redirect destroy when not logged in" do
+        assert_no_difference 'Micropost.count' do
+            delete :destroy, id: @micropost
+        end
+        assert_redirected_to login_url
+    end
+
+4 - Add these lines for microposts_controller
+
+    before_action :logged_in_user, only: [:create, :destroy]
+
+    def create
+    end
+
+    def destroy
+    end
