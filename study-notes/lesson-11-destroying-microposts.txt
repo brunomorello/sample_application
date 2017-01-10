@@ -1,0 +1,78 @@
+Lesson 11 Destroying Microposts and Micropost Tests
+
+1 - Create a Delete for Microposts - it shows only for the User that created the micropost
+
+1.1 - Edit the micropost partial - app/views/microposts/_micropost.html.erb
+
+    Add these lines after Posted XX times ago.
+
+    <% if current_user?(micropost.user) %>
+        <%= link_to "delete", micropost, method: :delete, data: { confirm: "You sure?" } %>
+    <% end %>
+
+1.2 - Create the Destroy action on microposts controller
+
+    1.2.1 - Create a private method for correct_user
+
+        def correct_user
+            @micropost = current_user.microposts.find_by(id: params[:id])
+            redirect_to root_url if @micropost.nil?            
+        end
+
+    1.2.2 - Create the filter - before_action
+
+        before_action :correct_user, only: :destroy        
+
+    1.2.3 - Create Destroy Action
+
+        def destroy
+            @micropost.destroy
+            flash[:success] = "Micropost deleted"
+            redirect_to request.referrer || root_url
+        end    
+
+2 - Create some tests
+
+    2.1 - Create a new fixture for micropost:
+
+        ants:
+            content: "BLA BLA BLA BLA"
+            created_at: <%= 2.years.ago %>
+            user: archer
+
+        zone:
+            content: "Danger zone!"
+            created_at: <%= 3.days.ago %>
+            user: archer
+
+        tone:
+            content: "another test"
+            created_at: <%= 10.minutes.ago %>
+            user: lana
+
+        van:
+            content: "hey dude!"
+            created_at: <%= 4.hours.ago %>
+            user: lana
+
+    2.2  - Create a new user in Users fixture
+
+        lana:
+            name: Lana Kane
+            email: hands@example.com
+            password_digest: <%= User.digest('password') %>
+            activated: true
+            activated_at: <%= Time.zone.now %>
+
+    2.3 - Test a try to delete a post for a user that didn't create it
+
+        test "should redirect destroy for wrong micropost" do
+            log_in_as(users(:bruno))
+            assert_no_difference 'Micropost.count' do
+                delete :destroy, id: microposts(:ants)
+            end
+        end
+
+3 - Create a Test for Interface
+
+    rails generate integration_test microposts_interface
