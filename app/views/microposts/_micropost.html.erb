@@ -7,6 +7,8 @@
 
     <span class="content">
         <%= micropost.content %>
+
+        <%= image_tag micropost.picture.url if micropost.picture? %>
     </span>
 
     <span class="timestamp">
