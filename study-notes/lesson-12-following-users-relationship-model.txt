@@ -1,0 +1,104 @@
+Lesson 12 Following Users - The relationship model
+
+1 - Create a Has many through Relationship
+
+    rails generate model Relationship follower_id:integer followed_id:integer
+
+2 - Change the migration file
+
+    class CreateRelationships < ActiveRecord::Migration
+      def change
+        create_table :relationships do |t|
+          t.integer :follower_id, index: true
+          t.integer :followed_id, index: true
+
+          t.timestamps null: false
+        end
+        add_index :relationships, [:follower_id, :followed_id], unique: true
+      end
+    end
+
+    2.1 - Run Migration
+
+        rake db:migrate
+
+3 - Create the Relationships
+
+    3.1 - Add has_many relationship in User model
+
+    has_many :active_relationships, class_name:  "Relationship",
+                                    foreign_key: "follower_id",
+                                    dependent:   :destroy
+    has_many :following, through: :active_relationships, source: :followed
+
+    has_many :passive_relationships, class_name:  "Relationship",
+                                     foreign_key: "followed_id",
+                                     dependent:   :destroy
+    has_many :followers, through: :passive_relationships, source: :follower
+
+
+    3.2 - Add belongs_to relationship in Relationship model and its validations
+
+        # Associations - Relationships
+        belongs_to :follower, class_name: "User"
+        belongs_to :followed, class_name: "User"
+
+        # Validations
+        validates :follower_id, presence: true
+        validates :followed_id, presence: true           
+
+4 - Write Tests
+
+    4.1 relationship_test.rb
+
+        def setup
+            @relationship = Relationship.new(follower_id: 1, followed_id: 2)
+        end
+
+        test "should be valid" do
+            assert @relationship.valid?
+        end
+
+        test "should require a follower_id" do
+            @relationship.follower_id = nil
+            assert_not @relationship.valid?
+        end
+
+        test "should require a followed_id" do
+            @relationship.followed_id = nil
+            assert_not @relationship.valid?
+        end
+
+    4.2 - user_test.rb - to test follow and unfollow
+
+        test "should follow and unfollow a user" do
+            bruno = users(:bruno)
+            archer = users(:archer)
+            assert_not bruno.following?(archer)
+            bruno.follow(archer)
+            assert bruno.following?(archer)
+            assert archer.followers.include?(bruno)
+            bruno.unfollow(archer)
+            assert_not bruno.following?(archer)
+        end
+
+    4.3 - Create methods in User Model - follow, unfollow and following
+
+        # Follows a user
+        def follow(other_user)
+            active_relationships.create(followed_id: other_user.id)
+        end
+
+        # Unfollows a user
+        def unfollow(other_user)
+            active_relationships.find_by(followed_id: other_user.id).destroy
+        end
+
+        # Returns true if the current user is following the other user
+        def following?(other_user)
+            self.following.include?(other_user)
+
+            # Another Way to do the same thing
+            # !active_relationships.find_by(followed_id: other_user.id).nil?
+        end
+
