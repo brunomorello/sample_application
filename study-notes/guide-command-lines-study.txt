@@ -7,9 +7,11 @@ Sample app - commandlines
 	sudo yum install /usr/include/libpq-fe.h
 
 3 - gem install pg
-4 - bundle update
-5 - sudo yum install nodejs
-6 - bundle install
+4 - sudo yum install nodejs
+5 - gem install rails
+6 - install RVM https://rvm.io/
+7 - bundle update
+8 - bundle install
 
 # create app
 
