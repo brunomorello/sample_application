@@ -1,5 +1,16 @@
 Sample app - commandlines
 
+# Configuring Rails Fedora 25
+
+1 - Install Ruby from source
+2 - Install libpq-fe.h lib with:
+	sudo yum install /usr/include/libpq-fe.h
+
+3 - gem install pg
+4 - bundle update
+5 - sudo yum install nodejs
+6 - bundle install
+
 # create app
 
 1 rails new sample_app
